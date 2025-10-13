@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RadioAtividade - Hub Educacional</title>
+    <style>
+        /* ===== RESET E BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #3b2f2f 0%, #2a1f1f 100%);
+            color: #f3e9de;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Textura de grão no fundo */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" /></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.05"/></svg>');
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* ===== CONTAINER PRINCIPAL ===== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ===== CABEÇALHO ===== */
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        /* Ondas sonoras decorativas */
+        .sound-waves {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            opacity: 0.3;
+        }
+
+        .wave {
+            width: 4px;
+            background: linear-gradient(to top, #00c8d7, #d4a15b);
+            border-radius: 2px;
+            animation: wave-pulse 1.5s ease-in-out infinite;
+        }
+
+        .wave:nth-child(1) { height: 20px; animation-delay: 0s; }
+        .wave:nth-child(2) { height: 35px; animation-delay: 0.1s; }
+        .wave:nth-child(3) { height: 50px; animation-delay: 0.2s; }
+        .wave:nth-child(4) { height: 40px; animation-delay: 0.3s; }
+        .wave:nth-child(5) { height: 55px; animation-delay: 0.4s; }
+        .wave:nth-child(6) { height: 30px; animation-delay: 0.5s; }
+        .wave:nth-child(7) { height: 45px; animation-delay: 0.6s; }
+
+        @keyframes wave-pulse {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(1.5); }
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #d4a15b;
+            text-shadow: 3px 3px 0 #00c8d7, 6px 6px 0 rgba(0, 0, 0, 0.3);
+            letter-spacing: 2px;
+            margin-top: 60px;
+            margin-bottom: 10px;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #f3e9de;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            font-size: 0.95rem;
+            color: #00c8d7;
+            font-style: italic;
+        }
+
+        /* ===== ÍCONES DECORATIVOS ===== */
+        .icon-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .icon {
+            font-size: 2.5rem;
+            opacity: 0.6;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .icon:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* ===== GRID DE AULAS ===== */
+        .lessons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        /* ===== CARD DE AULA ===== */
+        .lesson-card {
+            background: linear-gradient(145deg, #4a3838 0%, #3b2f2f 100%);
+            border: 2px solid #d4a15b;
+            border-radius: 15px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(212, 161, 91, 0.4);
+            border-color: #00c8d7;
+        }
+
+        .lesson-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #d4a15b, #00c8d7);
+        }
+
+        .lesson-number {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #d4a15b;
+            color: #3b2f2f;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .lesson-title {
+            font-size: 1.5rem;
+            color: #d4a15b;
+            margin-bottom: 10px;
+            padding-right: 50px;
+        }
+
+        .lesson-description {
+            color: #f3e9de;
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .lesson-meta {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            color: #00c8d7;
+        }
+
+        /* Barra de progresso */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(243, 233, 222, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #d4a15b, #00c8d7);
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .progress-text {
+            font-size: 0.85rem;
+            color: #f3e9de;
+            opacity: 0.7;
+        }
+
+        /* Botão de ação */
+        .lesson-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #d4a15b, #c89550);
+            color: #3b2f2f;
+            padding: 12px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+
+        .lesson-button:hover {
+            background: linear-gradient(135deg, #00c8d7, #00b0bd);
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        /* ===== RODAPÉ ===== */
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            border-top: 2px solid rgba(212, 161, 91, 0.3);
+            margin-top: 50px;
+        }
+
+        footer p {
+            color: #f3e9de;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        /* ===== RESPONSIVIDADE ===== */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .lessons-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .icon-container {
+                gap: 20px;
+            }
+
+            .icon {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .lesson-card {
+                padding: 20px;
+            }
+        }
+    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Cabeçalho -->
+        <header>
+            <div class="sound-waves" aria-hidden="true">
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+            </div>
+            <h1>RadioAtividade</h1>
+            <p class="subtitle">Eletiva de Comunicação e Mídia</p>
+            <p class="tagline">Do rádio vintage aos podcasts modernos</p>
+            
+            <div class="icon-container" aria-hidden="true">
+                <span class="icon">📻</span>
+                <span class="icon">🎙️</span>
+                <span class="icon">📡</span>
+            </div>
+        </header>
+
+        <!-- Grid de Aulas -->
+        <main>
+            <div class="lessons-grid">
+                <!-- Aula 01 -->
+                <article class="lesson-card" onclick="window.location.href='aula-01.html'" role="button" tabindex="0" aria-label="Acessar Aula 1: Terror no Rádio">
+                    <div class="lesson-number" aria-hidden="true">01</div>
+                    <h2 class="lesson-title">Terror no Rádio</h2>
+                    <p class="lesson-description">
+                        Descubra como o rádio criou momentos de pânico e suspense que marcaram gerações. 
+                        Explore a arte da narrativa sonora e o poder da imaginação.
+                    </p>
+                    <div class="lesson-meta">
+                        <span class="meta-item">⏱️ 10 min</span>
+                        <span class="meta-item">📊 8 slides</span>
+                        <span class="meta-item">🎬 1 vídeo</span>
+                    </div>
+                    <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-fill" id="progress-aula-01" style="width: 0%"></div>
+                    </div>
+                    <p class="progress-text" id="progress-text-01">Não iniciada</p>
+                    <a href="aula-01.html" class="lesson-button" aria-label="Iniciar Aula 1">Iniciar Aula</a>
+                </article>
+
+                <!-- Aula 02 -->
+                <article class="lesson-card" onclick="window.location.href='aula-02.html'" role="button" tabindex="0" aria-label="Acessar Aula 2: Comédia e Esportes no Rádio">
+                    <div class="lesson-number" aria-hidden="true">02</div>
+                    <h2 class="lesson-title">Comédia e Esportes no Rádio</h2>
+                    <p class="lesson-description">
+                        Compare a narração esportiva no rádio e na TV. Entenda como o humor e a emoção 
+                        são transmitidos apenas com palavras e sons.
+                    </p>
+                    <div class="lesson-meta">
+                        <span class="meta-item">⏱️ 10 min</span>
+                        <span class="meta-item">📊 8 slides</span>
+                        <span class="meta-item">🎬 1 vídeo</span>
+                    </div>
+                    <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-fill" id="progress-aula-02" style="width: 0%"></div>
+                    </div>
+                    <p class="progress-text" id="progress-text-02">Não iniciada</p>
+                    <a href="aula-02.html" class="lesson-button" aria-label="Iniciar Aula 2">Iniciar Aula</a>
+                </article>
+
+                <!-- Aula 03 -->
+                <article class="lesson-card" onclick="window.location.href='aula-03.html'" role="button" tabindex="0" aria-label="Acessar Aula 3: Podcasts - O Rádio Moderno">
+                    <div class="lesson-number" aria-hidden="true">03</div>
+                    <h2 class="lesson-title">Podcasts: O Rádio Moderno</h2>
+                    <p class="lesson-description">
+                        Descubra como os podcasts revolucionaram a forma de consumir conteúdo em áudio. 
+                        Do rádio tradicional ao streaming sob demanda.
+                    </p>
+                    <div class="lesson-meta">
+                        <span class="meta-item">⏱️ 10 min</span>
+                        <span class="meta-item">📊 8 slides</span>
+                        <span class="meta-item">🎬 1 vídeo</span>
+                    </div>
+                    <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-fill" id="progress-aula-03" style="width: 0%"></div>
+                    </div>
+                    <p class="progress-text" id="progress-text-03">Não iniciada</p>
+                    <a href="aula-03.html" class="lesson-button" aria-label="Iniciar Aula 3">Iniciar Aula</a>
+                </article>
+
+                <!-- Aula 04 -->
+                <article class="lesson-card" onclick="window.location.href='aula-04.html'" role="button" tabindex="0" aria-label="Acessar Aula 4: Rádio e Música">
+                    <div class="lesson-number" aria-hidden="true">04</div>
+                    <h2 class="lesson-title">Rádio e Música</h2>
+                    <p class="lesson-description">
+                        Descubra como o rádio transformou a indústria musical e lançou carreiras. 
+                        A história da música brasileira está intimamente ligada ao rádio.
+                    </p>
+                    <div class="lesson-meta">
+                        <span class="meta-item">⏱️ 10 min</span>
+                        <span class="meta-item">📊 8 slides</span>
+                        <span class="meta-item">🎬 1 vídeo</span>
+                    </div>
+                    <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-fill" id="progress-aula-04" style="width: 0%"></div>
+                    </div>
+                    <p class="progress-text" id="progress-text-04">Não iniciada</p>
+                    <a href="aula-04.html" class="lesson-button" aria-label="Iniciar Aula 4">Iniciar Aula</a>
+                </article>
+
+                <!-- Aula 05 -->
+                <article class="lesson-card" onclick="window.location.href='aula-05.html'" role="button" tabindex="0" aria-label="Acessar Aula 5: Jornalismo no Rádio">
+                    <div class="lesson-number" aria-hidden="true">05</div>
+                    <h2 class="lesson-title">Jornalismo no Rádio</h2>
+                    <p class="lesson-description">
+                        Descubra como o rádio se tornou a principal fonte de notícias em tempo real. 
+                        A importância do radiojornalismo na história e nos dias atuais.
+                    </p>
+                    <div class="lesson-meta">
+                        <span class="meta-item">⏱️ 10 min</span>
+                        <span class="meta-item">📊 8 slides</span>
+                        <span class="meta-item">🎬 1 vídeo</span>
+                    </div>
+                    <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-fill" id="progress-aula-05" style="width: 0%"></div>
+                    </div>
+                    <p class="progress-text" id="progress-text-05">Não iniciada</p>
+                    <a href="aula-05.html" class="lesson-button" aria-label="Iniciar Aula 5">Iniciar Aula</a>
+                </article>
+            </div>
+        </main>
+
+        <!-- Rodapé -->
+        <footer>
+            <p>📻 RadioAtividade - Projeto Educacional 2025</p>
+            <p style="margin-top: 10px; font-size: 0.8rem;">
+                Conteúdo educacional com licenças Creative Commons e uso justo educacional
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // ===== SISTEMA DE PROGRESSO =====
+        function updateProgress() {
+            // Aula 01
+            const aula01Data = JSON.parse(localStorage.getItem('radioatividade_aula_01') || '{}');
+            const progress01 = aula01Data.completed ? 100 : (aula01Data.slideProgress?.length || 0) * 12.5;
+            document.getElementById('progress-aula-01').style.width = progress01 + '%';
+            document.getElementById('progress-aula-01').parentElement.setAttribute('aria-valuenow', progress01);
+            
+            if (progress01 === 0) {
+                document.getElementById('progress-text-01').textContent = 'Não iniciada';
+            } else if (progress01 === 100) {
+                document.getElementById('progress-text-01').textContent = '✓ Concluída';
+            } else {
+                document.getElementById('progress-text-01').textContent = `${Math.round(progress01)}% completa`;
+            }
+
+            // Aula 02
+            const aula02Data = JSON.parse(localStorage.getItem('radioatividade_aula_02') || '{}');
+            const progress02 = aula02Data.completed ? 100 : (aula02Data.slideProgress?.length || 0) * 12.5;
+            document.getElementById('progress-aula-02').style.width = progress02 + '%';
+            document.getElementById('progress-aula-02').parentElement.setAttribute('aria-valuenow', progress02);
+            
+            if (progress02 === 0) {
+                document.getElementById('progress-text-02').textContent = 'Não iniciada';
+            } else if (progress02 === 100) {
+                document.getElementById('progress-text-02').textContent = '✓ Concluída';
+            } else {
+                document.getElementById('progress-text-02').textContent = `${Math.round(progress02)}% completa`;
+            }
+
+            // Aula 03
+            const aula03Data = JSON.parse(localStorage.getItem('radioatividade_aula_03') || '{}');
+            const progress03 = aula03Data.completed ? 100 : (aula03Data.slideProgress?.length || 0) * 12.5;
+            document.getElementById('progress-aula-03').style.width = progress03 + '%';
+            document.getElementById('progress-aula-03').parentElement.setAttribute('aria-valuenow', progress03);
+            
+            if (progress03 === 0) {
+                document.getElementById('progress-text-03').textContent = 'Não iniciada';
+            } else if (progress03 === 100) {
+                document.getElementById('progress-text-03').textContent = '✓ Concluída';
+            } else {
+                document.getElementById('progress-text-03').textContent = `${Math.round(progress03)}% completa`;
+            }
+
+            // Aula 04
+            const aula04Data = JSON.parse(localStorage.getItem('radioatividade_aula_04') || '{}');
+            const progress04 = aula04Data.completed ? 100 : (aula04Data.slideProgress?.length || 0) * 12.5;
+            document.getElementById('progress-aula-04').style.width = progress04 + '%';
+            document.getElementById('progress-aula-04').parentElement.setAttribute('aria-valuenow', progress04);
+            
+            if (progress04 === 0) {
+                document.getElementById('progress-text-04').textContent = 'Não iniciada';
+            } else if (progress04 === 100) {
+                document.getElementById('progress-text-04').textContent = '✓ Concluída';
+            } else {
+                document.getElementById('progress-text-04').textContent = `${Math.round(progress04)}% completa`;
+            }
+
+            // Aula 05
+            const aula05Data = JSON.parse(localStorage.getItem('radioatividade_aula_05') || '{}');
+            const progress05 = aula05Data.completed ? 100 : (aula05Data.slideProgress?.length || 0) * 12.5;
+            document.getElementById('progress-aula-05').style.width = progress05 + '%';
+            document.getElementById('progress-aula-05').parentElement.setAttribute('aria-valuenow', progress05);
+            
+            if (progress05 === 0) {
+                document.getElementById('progress-text-05').textContent = 'Não iniciada';
+            } else if (progress05 === 100) {
+                document.getElementById('progress-text-05').textContent = '✓ Concluída';
+            } else {
+                document.getElementById('progress-text-05').textContent = `${Math.round(progress05)}% completa`;
+            }
+        }
+
+        // Atualiza progresso ao carregar a página
+        updateProgress();
+
+        // Atualiza progresso quando a janela recebe foco
+        window.addEventListener('focus', updateProgress);
+
+        // ===== ACESSIBILIDADE: NAVEGAÇÃO POR TECLADO =====
+        document.querySelectorAll('.lesson-card').forEach(card => {
+            card.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    card.click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula 01 - Terror no Rádio | RadioAtividade</title>
+    <style>
+        /* ===== RESET E BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #3b2f2f 0%, #2a1f1f 100%);
+            color: #f3e9de;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Textura de grão */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" /></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.05"/></svg>');
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* ===== CONTAINER DE SLIDES ===== */
+        .slide-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 40px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* ===== CONTEÚDO DOS SLIDES ===== */
+        .slide-content {
+            max-width: 1000px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .slide-title {
+            font-size: 3.5rem;
+            color: #d4a15b;
+            margin-bottom: 30px;
+            text-shadow: 3px 3px 0 rgba(0, 200, 215, 0.3);
+            font-weight: bold;
+        }
+
+        .slide-subtitle {
+            font-size: 1.8rem;
+            color: #00c8d7;
+            margin-bottom: 20px;
+        }
+
+        .slide-text {
+            font-size: 1.3rem;
+            line-height: 1.8;
+            color: #f3e9de;
+            margin-bottom: 30px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .slide-icon {
+            font-size: 5rem;
+            margin-bottom: 30px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* ===== VÍDEO ===== */
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            padding-bottom: 45%; /* 16:9 aspect ratio ajustado */
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .video-poster {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .video-poster:hover {
+            transform: scale(1.02);
+        }
+
+        .play-button {
+            width: 100px;
+            height: 100px;
+            background: rgba(212, 161, 91, 0.95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #3b2f2f;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(212, 161, 91, 0.5);
+        }
+
+        .play-button:hover {
+            background: #d4a15b;
+            transform: scale(1.15);
+        }
+
+        .video-frame {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: none;
+        }
+
+        /* ===== PERGUNTAS ===== */
+        .question-container {
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .question-title {
+            font-size: 2rem;
+            color: #d4a15b;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            background: rgba(212, 161, 91, 0.15);
+            border: 3px solid rgba(212, 161, 91, 0.4);
+            border-radius: 15px;
+            padding: 25px 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 1.2rem;
+        }
+
+        .option:hover {
+            background: rgba(212, 161, 91, 0.25);
+            border-color: #d4a15b;
+            transform: translateX(10px);
+        }
+
+        .option.selected {
+            background: rgba(0, 200, 215, 0.2);
+            border-color: #00c8d7;
+        }
+
+        .option.correct {
+            background: rgba(0, 200, 215, 0.3);
+            border-color: #00c8d7;
+            animation: pulse 0.5s ease;
+        }
+
+        .option.incorrect {
+            background: rgba(200, 0, 0, 0.2);
+            border-color: #c00;
+            opacity: 0.6;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .option-letter {
+            background: #d4a15b;
+            color: #3b2f2f;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .feedback {
+            background: rgba(0, 200, 215, 0.15);
+            border-left: 5px solid #00c8d7;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 30px;
+            display: none;
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+
+        .feedback.show {
+            display: block;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== CURIOSIDADE ===== */
+        .curiosity-box {
+            background: linear-gradient(135deg, rgba(0, 200, 215, 0.15), rgba(212, 161, 91, 0.15));
+            border: 3px solid #00c8d7;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .curiosity-title {
+            font-size: 1.8rem;
+            color: #00c8d7;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .curiosity-text {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #f3e9de;
+        }
+
+        .curiosity-source {
+            margin-top: 15px;
+            font-size: 1rem;
+            color: #d4a15b;
+            text-align: center;
+        }
+
+        .curiosity-source a {
+            color: #00c8d7;
+            text-decoration: none;
+        }
+
+        /* ===== ÁREA DE COMENTÁRIOS ===== */
+        .comment-box {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .comment-title {
+            font-size: 1.8rem;
+            color: #d4a15b;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .comment-input {
+            width: 100%;
+            min-height: 150px;
+            background: rgba(243, 233, 222, 0.1);
+            border: 3px solid rgba(212, 161, 91, 0.4);
+            border-radius: 15px;
+            padding: 20px;
+            color: #f3e9de;
+            font-family: inherit;
+            font-size: 1.2rem;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+
+        .comment-input:focus {
+            outline: none;
+            border-color: #00c8d7;
+            background: rgba(243, 233, 222, 0.15);
+        }
+
+        .save-status {
+            font-size: 1rem;
+            color: #00c8d7;
+            text-align: center;
+        }
+
+        /* ===== NAVEGAÇÃO ===== */
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            z-index: 10;
+            background: rgba(59, 47, 47, 0.9);
+            padding: 20px 30px;
+            border-radius: 50px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #d4a15b, #c89550);
+            color: #3b2f2f;
+            padding: 15px 30px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #00c8d7, #00b0bd);
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .slide-counter {
+            color: #f3e9de;
+            font-size: 1.1rem;
+            font-weight: bold;
+            padding: 0 20px;
+        }
+
+        .home-button {
+            background: rgba(212, 161, 91, 0.2);
+            color: #d4a15b;
+            border: 2px solid #d4a15b;
+        }
+
+        .home-button:hover {
+            background: rgba(212, 161, 91, 0.3);
+            color: #d4a15b;
+        }
+
+        /* ===== INDICADOR DE PROGRESSO ===== */
+        .progress-dots {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(212, 161, 91, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .progress-dot.active {
+            background: #d4a15b;
+            transform: scale(1.3);
+        }
+
+        .progress-dot.completed {
+            background: #00c8d7;
+        }
+
+        /* ===== RESPONSIVIDADE ===== */
+        @media (max-width: 768px) {
+            .slide {
+                padding: 40px 20px;
+            }
+
+            .slide-title {
+                font-size: 2.5rem;
+            }
+
+            .slide-subtitle {
+                font-size: 1.4rem;
+            }
+
+            .slide-text {
+                font-size: 1.1rem;
+            }
+
+            .question-title {
+                font-size: 1.5rem;
+            }
+
+            .option {
+                padding: 20px;
+                font-size: 1rem;
+            }
+
+            .navigation {
+                bottom: 20px;
+                padding: 15px 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .nav-button {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <div class="slide-container">
+        <!-- SLIDE 1: TÍTULO -->
+        <div class="slide active" id="slide-1">
+            <div class="slide-content">
+                <div class="slide-icon">📻</div>
+                <h1 class="slide-title">Terror no Rádio</h1>
+                <p class="slide-subtitle">Aula 01 - RadioAtividade</p>
+                <p class="slide-text">
+                    Descubra como o rádio criou momentos de pânico e suspense que marcaram gerações.
+                    Explore a arte da narrativa sonora e o poder da imaginação.
+                </p>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: VÍDEO -->
+        <div class="slide" id="slide-2">
+            <div class="slide-content">
+                <h2 class="slide-subtitle">O Poder do Terror Sonoro</h2>
+                <!-- 
+                    INSTRUÇÕES PARA TROCAR O VÍDEO:
+                    1. Substitua o ID do vídeo no atributo data-video-id
+                    2. Ajuste data-start e data-end (em segundos)
+                    3. Troque a URL da imagem de poster no style
+                -->
+                <div class="video-container">
+                    <div class="video-poster" id="video-poster" 
+                         data-video-id="ozbNL3nfWeo" 
+                         data-start="30" 
+                         data-end="120"
+                         style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800');"
+                         onclick="loadVideo(this)"
+                         role="button"
+                         tabindex="0"
+                         aria-label="Reproduzir vídeo">
+                        <div class="play-button">▶</div>
+                    </div>
+                    <iframe id="video-frame" class="video-frame" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                <p class="slide-text">
+                    Assista a este trecho sobre como o rádio criou momentos de terror memoráveis.
+                </p>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: PERGUNTA 1 -->
+        <div class="slide" id="slide-3">
+            <div class="slide-content">
+                <div class="question-container">
+                    <h2 class="question-title">O que torna o rádio especialmente eficaz para criar suspense e terror?</h2>
+                    <div class="options">
+                        <div class="option" onclick="selectAnswer(3, 'A', false)" role="button" tabindex="0">
+                            <span class="option-letter">A</span>
+                            <span class="option-text">As imagens assustadoras que aparecem na tela</span>
+                        </div>
+                        <div class="option" onclick="selectAnswer(3, 'B', true)" role="button" tabindex="0">
+                            <span class="option-letter">B</span>
+                            <span class="option-text">A imaginação do ouvinte preenche os detalhes visuais</span>
+                        </div>
+                        <div class="option" onclick="selectAnswer(3, 'C', false)" role="button" tabindex="0">
+                            <span class="option-letter">C</span>
+                            <span class="option-text">Os efeitos especiais digitais modernos</span>
+                        </div>
+                    </div>
+                    <div class="feedback" id="feedback-3"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: PERGUNTA 2 -->
+        <div class="slide" id="slide-4">
+            <div class="slide-content">
+                <div class="question-container">
+                    <h2 class="question-title">Onde você ouviria hoje um conteúdo similar ao terror radiofônico clássico?</h2>
+                    <div class="options">
+                        <div class="option" onclick="selectAnswer(4, 'A', false)" role="button" tabindex="0">
+                            <span class="option-letter">A</span>
+                            <span class="option-text">Apenas em rádios AM antigas</span>
+                        </div>
+                        <div class="option" onclick="selectAnswer(4, 'B', true)" role="button" tabindex="0">
+                            <span class="option-letter">B</span>
+                            <span class="option-text">Em podcasts de terror e audiodramas</span>
+                        </div>
+                        <div class="option" onclick="selectAnswer(4, 'C', false)" role="button" tabindex="0">
+                            <span class="option-letter">C</span>
+                            <span class="option-text">Somente em filmes de cinema</span>
+                        </div>
+                    </div>
+                    <div class="feedback" id="feedback-4"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: PERGUNTA 3 -->
+        <div class="slide" id="slide-5">
+            <div class="slide-content">
+                <div class="question-container">
+                    <h2 class="question-title">Qual elemento sonoro é mais importante para criar atmosfera de terror no rádio?</h2>
+                    <div class="options">
+                        <div class="option" onclick="selectAnswer(5, 'A', false)" role="button" tabindex="0">
+                            <span class="option-letter">A</span>
+                            <span class="option-text">Música alta e agitada o tempo todo</span>
+                        </div>
+                        <div class="option" onclick="selectAnswer(5, 'B', false)" role="button" tabindex="0">
+                            <span class="option-letter">B</span>
+                            <span class="option-text">Apenas a voz do narrador, sem efeitos</span>
+                        </div>
+                        <div class="option" onclick="selectAnswer(5, 'C', true)" role="button" tabindex="0">
+                            <span class="option-letter">C</span>
+                            <span class="option-text">Combinação de silêncios, sons ambientes e narração</span>
+                        </div>
+                    </div>
+                    <div class="feedback" id="feedback-5"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: CURIOSIDADE -->
+        <div class="slide" id="slide-6">
+            <div class="slide-content">
+                <div class="curiosity-box">
+                    <h2 class="curiosity-title">💡 Curiosidade Histórica</h2>
+                    <p class="curiosity-text">
+                        Em 1938, a transmissão radiofônica de "A Guerra dos Mundos" por Orson Welles causou 
+                        pânico real nos Estados Unidos. Muitos ouvintes acreditaram que uma invasão alienígena 
+                        estava realmente acontecendo, demonstrando o poder imersivo do rádio como mídia.
+                    </p>
+                    <p class="curiosity-source">
+                        Fonte: <a href="https://pt.wikipedia.org/wiki/A_Guerra_dos_Mundos_(r%C3%A1dio)" target="_blank">Wikipedia</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 7: COMENTÁRIOS -->
+        <div class="slide" id="slide-7">
+            <div class="slide-content">
+                <div class="comment-box">
+                    <h2 class="comment-title">💭 Sua Ideia para a Rádio Escolar</h2>
+                    <p class="slide-text">
+                        Proponha um tema para um mini-podcast de terror ou suspense:
+                    </p>
+                    <textarea 
+                        class="comment-input" 
+                        id="student-comment"
+                        placeholder="Exemplo: 'Lendas urbanas da nossa cidade contadas por estudantes...'"
+                        aria-label="Campo para sua ideia"
+                    ></textarea>
+                    <p class="save-status" id="save-status">💾 Salvo automaticamente</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 8: CONCLUSÃO -->
+        <div class="slide" id="slide-8">
+            <div class="slide-content">
+                <div class="slide-icon">✓</div>
+                <h1 class="slide-title">Aula Concluída!</h1>
+                <p class="slide-subtitle">Parabéns por completar a Aula 01</p>
+                <p class="slide-text">
+                    Você explorou o fascinante mundo do terror radiofônico e descobriu como 
+                    o poder da imaginação pode criar experiências assustadoras memoráveis.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Indicador de Progresso -->
+    <div class="progress-dots" id="progress-dots"></div>
+
+    <!-- Navegação -->
+    <nav class="navigation">
+        <button class="nav-button home-button" onclick="goHome()" aria-label="Voltar ao hub">
+            🏠 Hub
+        </button>
+        <button class="nav-button" id="prev-btn" onclick="prevSlide()" aria-label="Slide anterior">
+            ← Anterior
+        </button>
+        <span class="slide-counter" id="slide-counter">1 / 8</span>
+        <button class="nav-button" id="next-btn" onclick="nextSlide()" aria-label="Próximo slide">
+            Próximo →
+        </button>
+    </nav>
+
+    <script>
+        // ===== CONFIGURAÇÃO =====
+        const LESSON_ID = 'radioatividade_aula_01';
+        const TOTAL_SLIDES = 8;
+        let currentSlide = 1;
+        let lessonData = {
+            questionsAnswered: 0,
+            correctAnswers: 0,
+            completed: false,
+            comment: '',
+            slideProgress: []
+        };
+
+        // Respostas das perguntas
+        const answers = {
+            3: {
+                correct: 'B',
+                feedback: {
+                    correct: '✓ Correto! A imaginação é o elemento-chave do terror radiofônico. Sem imagens visuais, cada ouvinte cria seus próprios "monstros" mentais, que são sempre mais assustadores do que qualquer efeito visual poderia ser.',
+                    incorrect: '✗ Não exatamente. Lembre-se: o rádio não tem imagens visuais! O verdadeiro poder está na imaginação do ouvinte, que preenche os detalhes com seus próprios medos.'
+                }
+            },
+            4: {
+                correct: 'B',
+                feedback: {
+                    correct: '✓ Excelente! Os podcasts de terror modernos são os herdeiros diretos do terror radiofônico clássico. Plataformas como Spotify e Apple Podcasts têm milhares de audiodramas que usam as mesmas técnicas dos anos 1930-1950.',
+                    incorrect: '✗ Pense nos formatos modernos! Hoje, o terror sonoro vive principalmente nos podcasts e audiodramas digitais, que qualquer pessoa pode ouvir em smartphones e computadores.'
+                }
+            },
+            5: {
+                correct: 'C',
+                feedback: {
+                    correct: '✓ Perfeito! A arte do terror sonoro está na combinação equilibrada. Os silêncios criam tensão, os sons ambientes estabelecem o cenário, e a narração guia a imaginação. É a orquestra completa que assusta!',
+                    incorrect: '✗ O terror eficaz precisa de variedade! Apenas música ou apenas voz se tornam monótonos. A combinação de silêncios estratégicos, sons ambientes sutis e narração envolvente é o que realmente funciona.'
+                }
+            }
+        };
+
+        // ===== INICIALIZAÇÃO =====
+        function init() {
+            const saved = localStorage.getItem(LESSON_ID);
+            if (saved) {
+                lessonData = JSON.parse(saved);
+                document.getElementById('student-comment').value = lessonData.comment || '';
+            }
+            createProgressDots();
+            updateNavigation();
+            updateProgressDots();
+        }
+
+        // ===== NAVEGAÇÃO DE SLIDES =====
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+            if (n > TOTAL_SLIDES) n = TOTAL_SLIDES;
+            if (n < 1) n = 1;
+            
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[n - 1].classList.add('active');
+            
+            currentSlide = n;
+            updateNavigation();
+            updateProgressDots();
+            
+            // Marca slide como visitado
+            if (!lessonData.slideProgress.includes(n)) {
+                lessonData.slideProgress.push(n);
+                saveProgress();
+            }
+            
+            // Marca como concluído ao chegar no último slide
+            if (n === TOTAL_SLIDES && !lessonData.completed) {
+                lessonData.completed = true;
+                saveProgress();
+            }
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        function goHome() {
+            window.location.href = 'index.html';
+        }
+
+        function updateNavigation() {
+            document.getElementById('prev-btn').disabled = currentSlide === 1;
+            document.getElementById('next-btn').disabled = currentSlide === TOTAL_SLIDES;
+            document.getElementById('slide-counter').textContent = `${currentSlide} / ${TOTAL_SLIDES}`;
+        }
+
+        // ===== INDICADOR DE PROGRESSO =====
+        function createProgressDots() {
+            const container = document.getElementById('progress-dots');
+            for (let i = 1; i <= TOTAL_SLIDES; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'progress-dot';
+                dot.onclick = () => showSlide(i);
+                dot.setAttribute('aria-label', `Ir para slide ${i}`);
+                dot.setAttribute('role', 'button');
+                dot.setAttribute('tabindex', '0');
+                container.appendChild(dot);
+            }
+        }
+
+        function updateProgressDots() {
+            const dots = document.querySelectorAll('.progress-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.remove('active', 'completed');
+                if (index + 1 === currentSlide) {
+                    dot.classList.add('active');
+                } else if (lessonData.slideProgress.includes(index + 1)) {
+                    dot.classList.add('completed');
+                }
+            });
+        }
+
+        // ===== VÍDEO =====
+        function loadVideo(poster) {
+            const videoId = poster.getAttribute('data-video-id');
+            const start = poster.getAttribute('data-start');
+            const end = poster.getAttribute('data-end');
+            const iframe = document.getElementById('video-frame');
+            
+            const videoUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&start=${start}&end=${end}`;
+            
+            iframe.src = videoUrl;
+            iframe.style.display = 'block';
+            poster.style.display = 'none';
+        }
+
+        // ===== PERGUNTAS =====
+        function selectAnswer(slideNum, option, isCorrect) {
+            const slide = document.getElementById(`slide-${slideNum}`);
+            const options = slide.querySelectorAll('.option');
+            const feedback = document.getElementById(`feedback-${slideNum}`);
+            
+            options.forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'incorrect');
+                opt.style.pointerEvents = 'none';
+            });
+            
+            event.currentTarget.classList.add('selected');
+            
+            if (isCorrect) {
+                event.currentTarget.classList.add('correct');
+                feedback.textContent = answers[slideNum].feedback.correct;
+                lessonData.correctAnswers++;
+            } else {
+                event.currentTarget.classList.add('incorrect');
+                feedback.textContent = answers[slideNum].feedback.incorrect;
+                
+                // Mostra resposta correta
+                options.forEach(opt => {
+                    const letter = opt.querySelector('.option-letter').textContent;
+                    if (letter === answers[slideNum].correct) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            
+            feedback.classList.add('show');
+            
+            if (lessonData.questionsAnswered < (slideNum - 2)) {
+                lessonData.questionsAnswered = slideNum - 2;
+                saveProgress();
+            }
+        }
+
+        // ===== COMENTÁRIOS =====
+        const commentInput = document.getElementById('student-comment');
+        const saveStatus = document.getElementById('save-status');
+        let saveTimeout;
+
+        commentInput.addEventListener('input', () => {
+            clearTimeout(saveTimeout);
+            saveStatus.textContent = '✏️ Editando...';
+            
+            saveTimeout = setTimeout(() => {
+                lessonData.comment = commentInput.value;
+                saveProgress();
+                saveStatus.textContent = '✓ Salvo!';
+                
+                setTimeout(() => {
+                    saveStatus.textContent = '💾 Salvo automaticamente';
+                }, 2000);
+            }, 1000);
+        });
+
+        // ===== SALVAMENTO =====
+        function saveProgress() {
+            localStorage.setItem(LESSON_ID, JSON.stringify(lessonData));
+        }
+
+        // ===== NAVEGAÇÃO POR TECLADO =====
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                prevSlide();
+            } else if (e.key === 'ArrowRight') {
+                nextSlide();
+            } else if (e.key === 'Home') {
+                showSlide(1);
+            } else if (e.key === 'End') {
+                showSlide(TOTAL_SLIDES);
+            }
+        });
+
+        // Inicializa
+        init();
+    </script>
+</body>
+</html>
